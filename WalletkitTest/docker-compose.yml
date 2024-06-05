@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+    nginx:
+        container_name: wallet-nginx
+        image: nginx:latest
+        volumes:
+            - ./:/var/www
+            - ./_docker/nginx/conf.d:/etc/nginx/conf.d
+        ports:
+            - "8877:80"
+        depends_on:
+            - app
+    app:
+        container_name: wallet-app
+        build:
+            context: .
+            dockerfile: _docker/app/Dockerfile
+        ports:
+            - '9000:9000'
+        volumes:
+            - ./:/var/www
+
+    postgres:
+        image: postgres:13
+        container_name: wallet-db
+        restart: always
+        ports:
+            - "54332:5432"
+        environment:
+            - POSTGRES_DB=${DB_DATABASE}
+            - POSTGRES_USER=${DB_USERNAME}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        volumes:
+            - ./postgres/datadir:/var/lib/postgresql/data
+
+
